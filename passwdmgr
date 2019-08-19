@@ -1,0 +1,86 @@
+#!/bin/bash
+
+function _getpass() {
+    echo -n "$@"
+    read -s PASS
+    echo
+}
+
+function _exit() {
+    rm -f $TMPFILE
+    echo $1
+    exit $2
+}
+
+function _decryptfile() {
+    _getpass "Enter file password: "
+    openssl enc -iter 2 -d -a -aes-256-cbc -in $PASSWDFILE -out $TMPFILE -k $PASS\
+        || _exit "Decrypt failed! Check the password entered" -2
+}
+
+function _encryptfile() {
+    openssl enc -iter 2 -a -aes-256-cbc -in $TMPFILE -out $PASSWDFILE -k $PASS
+}
+
+function _create() {
+    [[ -f $PASSWDFILE ]] && _exit "Password store $PASSWDFILE exists. Not creating new one" -1
+    _getpass "Enter file password: "
+    NEWPASS=$PASS
+    _getpass "Confirm file password: "
+
+    [[ "$NEWPASS" != "$PASS" ]] && _exit "Passwords don't match" -1
+    echo "file:passwdstore:$PASS" >> $TMPFILE
+    _encryptfile
+}
+
+PASSWDFILE=$HOME/.local/share/passwdstore
+TMPFILE=$(mktemp)
+
+case "$1" in
+    create)
+        _create;;
+    add)
+        [[ -z "$2" ]] && _exit "Please provide password name" -2
+        _decryptfile
+        grep -q "^$2:" $TMPFILE &&\
+            echo -n -e "Password name $2 exists.\nPress Enter to update, Ctrl-C to exit" &&\
+            read -s _random &&\
+            sed -i "/^$2:/d" $TMPFILE
+
+        read -p "username: " USERNAME
+        read -p "password: " NEWPASS
+        sleep 1
+        echo -n -e "\e[1A\e[K"
+        echo "$2:$USERNAME:$NEWPASS" >> $TMPFILE
+
+        _encryptfile
+        ;;
+    get)
+        [[ -z "$2" ]] && _exit "Please provide password name" -2
+        _decryptfile
+        awk -F":" "/^$2:/"'{print $2" - "$3}' $TMPFILE
+        ;;
+    rm)
+        [[ -z "$2" ]] && _exit "Please provide password name" -2
+        _decryptfile
+        sed -i "/^$2:/d" $TMPFILE
+        _encryptfile
+        ;;
+    ls)
+        _decryptfile
+        awk -F":" '{print $1}' $TMPFILE
+        ;;
+    *)
+        echo -e "Simple password manager for the terminal
+usage: $0 <command> [password-name]\n\nCommands:
+    create: Create new store file
+    add: Add new password to the store
+    get: Retrieve password from store
+    rm: Remove password from store
+    ls: List all stored passwords
+    help: This text"
+        ;;
+esac
+
+_exit "Done!" 0
+

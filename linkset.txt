@@ -1,0 +1,5 @@
+rclink : .local/bin/rclink
+rcunlink : .local/bin/rcunlink
+steamrice : .local/bin/steamrice
+cpub/cpub : .local/bin/cpub
+passwdmgr : .local/bin/pwmg
