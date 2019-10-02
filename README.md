@@ -55,3 +55,7 @@ Commands:
     help: This text
 Done!
 ```
+
+### `fetchmf`
+
+Fetches latest NAV for a list of Mutual Funds from https://www.mfapi.in/ . Currently list is hardcoded.

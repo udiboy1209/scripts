@@ -1,0 +1,42 @@
+#!/usr/bin/python
+
+import os
+import json
+import requests
+
+MFLIST = [
+    101762, # HDFC
+    102147,
+    118955,
+    119118,
+
+    118481, # IDFC
+    108909,
+
+    118650, # Reliance
+    101161,
+
+    101144, # ICICI
+    120334,
+    120599,
+
+    100081, # DSP
+
+    119716, # SBI
+
+    119091, # HDFC Liquid
+]
+
+APIURL = "https://api.mfapi.in/mf/%d"
+
+for mfnum in MFLIST:
+    url = APIURL % mfnum
+    res = requests.get(url)
+
+    if res:
+        data = json.loads(res.content)
+        if data["status"] == "SUCCESS":
+            print("{nav:}, {date:}, {0}".format(data["meta"]["scheme_name"], **data["data"][0]))
+            continue
+
+    print("{}: error".format(mfnum))
