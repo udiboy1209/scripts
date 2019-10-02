@@ -9,7 +9,7 @@ They work like GNU/stow but are extremely simple and only use soft-links.
 They are used to manage sets of softlinked files, like configs etc.
 You can store 'linkset's in a txt file, refer to "linkset.txt" as an example.
 
-####Usage:
+#### Usage:
 
 ```
 [/path/of/src/files] $ rclink linkset.txt
@@ -23,7 +23,7 @@ I use it to change theme colors of my config files.
 Refer to (dotfiles repo)[https://github.com/udiboy/dotfiles] for examples of "theme.yaml"
 and template files.
 
-####Usage:
+#### Usage:
 
 ```
 $ steamrice <-t|--theme theme.yaml> [-s|--source source-dir] [-d|--destination dest-dir] 
@@ -40,7 +40,7 @@ with GPG keys and so many features.
 It can store/retrieve/list/remove account+password stored in a file.
 File is encrypted using AES-256 and stored as plaintext base64.
 
-####Usage:
+#### Usage:
 
 ```
 Simple password manager for the terminal
